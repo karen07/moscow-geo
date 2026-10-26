@@ -1,14 +1,12 @@
 # Moscow Geo
 
-Moscow Geo is a small collection of GeoJSON datasets for Moscow districts and the MKAD boundary.
-
-The repository includes the original district geometry, full and simplified MKAD geometry, and a precomputed dataset where Moscow districts are selected and clipped to the MKAD area. A Python script is included so the derived file can be regenerated instead of treated as an opaque artifact.
-
-The data is intended for maps, lightweight geospatial analysis, filtering objects inside MKAD, and other projects that need a simple reusable Moscow boundary dataset.
+GeoJSON datasets for Moscow districts and the MKAD boundary, together with a Python script
+for generating a district map clipped to the MKAD area.
 
 ## Описание
 
-Moscow Geo - небольшая коллекция наборов GeoJSON с районами Москвы и границей МКАД.
+Наборы GeoJSON с районами Москвы и границей МКАД, а также Python-скрипт для построения карты
+районов с обрезкой по территории внутри МКАД.
 
 Репозиторий содержит исходную геометрию районов, полную и упрощенную геометрию МКАД, а также заранее рассчитанный набор, в котором районы Москвы отобраны и обрезаны по области внутри МКАД. В комплект входит Python скрипт, поэтому производный файл можно пересоздать, а не использовать как непрозрачный готовый результат.
 
@@ -19,6 +17,20 @@ Moscow Geo - небольшая коллекция наборов GeoJSON с р�
 ![Районы Москвы внутри МКАД](./example2.png)
 
 На первом изображении показана область МКАД. На втором - районы Москвы, отобранные и обрезанные по этой области.
+
+## Содержание
+
+- [Содержимое](#%D1%81%D0%BE%D0%B4%D0%B5%D1%80%D0%B6%D0%B8%D0%BC%D0%BE%D0%B5)
+- [Структура проекта](#%D1%81%D1%82%D1%80%D1%83%D0%BA%D1%82%D1%83%D1%80%D0%B0-%D0%BF%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D0%B0)
+- [Что делает скрипт](#%D1%87%D1%82%D0%BE-%D0%B4%D0%B5%D0%BB%D0%B0%D0%B5%D1%82-%D1%81%D0%BA%D1%80%D0%B8%D0%BF%D1%82)
+- [Требования](#%D1%82%D1%80%D0%B5%D0%B1%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F)
+- [Быстрый старт](#%D0%B1%D1%8B%D1%81%D1%82%D1%80%D1%8B%D0%B9-%D1%81%D1%82%D0%B0%D1%80%D1%82)
+- [Режим без обрезки](#%D1%80%D0%B5%D0%B6%D0%B8%D0%BC-%D0%B1%D0%B5%D0%B7-%D0%BE%D0%B1%D1%80%D0%B5%D0%B7%D0%BA%D0%B8)
+- [Основные параметры](#%D0%BE%D1%81%D0%BD%D0%BE%D0%B2%D0%BD%D1%8B%D0%B5-%D0%BF%D0%B0%D1%80%D0%B0%D0%BC%D0%B5%D1%82%D1%80%D1%8B)
+- [Примеры](#%D0%BF%D1%80%D0%B8%D0%BC%D0%B5%D1%80%D1%8B)
+- [Проверка GeoJSON](#%D0%BF%D1%80%D0%BE%D0%B2%D0%B5%D1%80%D0%BA%D0%B0-geojson)
+- [Система координат](#%D1%81%D0%B8%D1%81%D1%82%D0%B5%D0%BC%D0%B0-%D0%BA%D0%BE%D0%BE%D1%80%D0%B4%D0%B8%D0%BD%D0%B0%D1%82)
+- [Лицензия](#%D0%BB%D0%B8%D1%86%D0%B5%D0%BD%D0%B7%D0%B8%D1%8F)
 
 ## Содержимое
 
@@ -95,7 +107,7 @@ districts-in-mkad.geojson
 
 То есть район остается, если не меньше 10% его площади попадает внутрь МКАД.
 
-## Зависимости
+## Требования
 
 Нужен Python 3 и пакеты:
 
@@ -117,7 +129,7 @@ sudo pacman -S python python-pip
 python3 -m pip install shapely pyproj
 ```
 
-## Быстрый запуск
+## Быстрый старт
 
 Сгенерировать districts-in-mkad.geojson:
 
