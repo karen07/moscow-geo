@@ -1,263 +1,24 @@
 # Moscow Geo
 
-GeoJSON datasets for Moscow districts and the MKAD boundary, together with a Python script
-for generating a district map clipped to the MKAD area.
+GeoJSON datasets and SVG maps of Moscow districts and the MKAD boundary, with optional
+Python tools for filtering districts and exporting vector images.
 
-Наборы GeoJSON с районами Москвы и границей МКАД, а также Python-скрипт для построения карты
-районов с обрезкой по территории внутри МКАД.
+Наборы GeoJSON и SVG-карты районов Москвы и границы МКАД с Python-скриптами
+для обрезки районов и экспорта векторных изображений.
 
 ## Описание
 
-Репозиторий содержит исходную геометрию районов, полную и упрощённую геометрию МКАД, а также заранее рассчитанный набор, в котором районы Москвы отобраны и обрезаны по области внутри МКАД. В комплект входит Python скрипт, поэтому производный файл можно пересоздать, а не использовать как непрозрачный готовый результат.
+В репозитории хранятся готовые GeoJSON и SVG, которые можно использовать
+без запуска генераторов. Исходные GeoJSON не изменяются при экспорте SVG.
 
-Данные предназначены для карт, простого геопространственного анализа, фильтрации объектов внутри МКАД и других проектов, которым нужен переиспользуемый набор геометрии Москвы.
+![Контур МКАД](svg/mkad.svg)
 
-![Граница МКАД](./example1.png)
+![Районы внутри МКАД](svg/districts-in-mkad.svg)
 
-![Районы Москвы внутри МКАД](./example2.png)
-
-На первом изображении показана область МКАД. На втором - районы Москвы, отобранные и обрезанные по этой области.
-
-## Содержание
-
-- [Разработка и проверка изменений](#%D1%80%D0%B0%D0%B7%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%BA%D0%B0-%D0%B8-%D0%BF%D1%80%D0%BE%D0%B2%D0%B5%D1%80%D0%BA%D0%B0-%D0%B8%D0%B7%D0%BC%D0%B5%D0%BD%D0%B5%D0%BD%D0%B8%D0%B9)
-- [Требования](#%D1%82%D1%80%D0%B5%D0%B1%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F)
-- [Быстрый старт](#%D0%B1%D1%8B%D1%81%D1%82%D1%80%D1%8B%D0%B9-%D1%81%D1%82%D0%B0%D1%80%D1%82)
-- [Содержимое](#%D1%81%D0%BE%D0%B4%D0%B5%D1%80%D0%B6%D0%B8%D0%BC%D0%BE%D0%B5)
-- [Обработка геоданных](#%D0%BE%D0%B1%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%BA%D0%B0-%D0%B3%D0%B5%D0%BE%D0%B4%D0%B0%D0%BD%D0%BD%D1%8B%D1%85)
-- [Режим без обрезки](#%D1%80%D0%B5%D0%B6%D0%B8%D0%BC-%D0%B1%D0%B5%D0%B7-%D0%BE%D0%B1%D1%80%D0%B5%D0%B7%D0%BA%D0%B8)
-- [Основные параметры](#%D0%BE%D1%81%D0%BD%D0%BE%D0%B2%D0%BD%D1%8B%D0%B5-%D0%BF%D0%B0%D1%80%D0%B0%D0%BC%D0%B5%D1%82%D1%80%D1%8B)
-- [Примеры](#%D0%BF%D1%80%D0%B8%D0%BC%D0%B5%D1%80%D1%8B)
-- [Проверка GeoJSON](#%D0%BF%D1%80%D0%BE%D0%B2%D0%B5%D1%80%D0%BA%D0%B0-geojson)
-- [Система координат](#%D1%81%D0%B8%D1%81%D1%82%D0%B5%D0%BC%D0%B0-%D0%BA%D0%BE%D0%BE%D1%80%D0%B4%D0%B8%D0%BD%D0%B0%D1%82)
-- [Структура проекта](#%D1%81%D1%82%D1%80%D1%83%D0%BA%D1%82%D1%83%D1%80%D0%B0-%D0%BF%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D0%B0)
-- [Лицензия](#%D0%BB%D0%B8%D1%86%D0%B5%D0%BD%D0%B7%D0%B8%D1%8F)
-
-## Разработка и проверка изменений
-
-**Опорные символы для изменения поведения:**
-
-1. `load_geom_any`, `project_4326_to_3857`, `project_3857_to_4326`, `output_geometry` - чтение,
-   проецирование и выдача геометрии; сверяйте систему координат при изменении алгоритма обрезки.
-
-**Основные точки изменения:**
-
-- `mkad_district_filter.py` - чтение и обрезка GeoJSON-геометрии;
-- `moscow-districts.geojson` - исходные контуры районов;
-- `mkad.geojson` - граница МКАД;
-- `districts-in-mkad.geojson` - выходные геоданные, сохранённые в репозитории.
-
-**Проверка изменений:** При изменении алгоритма геометрии сначала проверьте входные данные и систему координат, затем пересоздайте результат по "Примеры" и выполните проверку GeoJSON из README. Выходные данные не следует считать исходным эталоном.
-
-**Типовые изменения:**
-
-- Правила отбора районов: изменяйте `mkad_district_filter.py` и сверяйте
-  одновременно порог площади и проверку `representative_point`.
-- Форму выходных контуров: учитывайте `--no-clip`, упрощение геометрии
-  и возврат координат в EPSG:4326 перед записью GeoJSON.
-
-**Границы входных GeoJSON:** `load_geom_any()` принимает геометрию,
-`Feature` или `FeatureCollection`, но в последнем случае использует только
-`features[0]` для контура МКАД. Если контур разбит между несколькими
-объектами коллекции, остальные части не будут учтены. Входные координаты
-интерпретируются как EPSG:4326 без определения CRS из файла; операция
-`Path(args.out).write_text()` перезаписывает существующий путь. Не задавайте исходный
-GeoJSON как выходной файл и проверяйте геометрию после обрезки.
-
-**Источник истины:** `moscow-districts.geojson` и `mkad.geojson` служат
-входными данными; `districts-in-mkad.geojson` является производным набором.
-Изменение только результата не меняет алгоритм его построения.
-
-## Требования
-
-Нужен Python 3 и пакеты:
-
-```text
-shapely
-pyproj
-```
-
-Установка через pip:
-
-```sh
-python3 -m pip install shapely pyproj
-```
-
-На Arch Linux:
-
-```sh
-sudo pacman -S python python-pip
-python3 -m pip install shapely pyproj
-```
-
-## Быстрый старт
-
-Сгенерировать districts-in-mkad.geojson:
-
-```sh
-python3 mkad_district_filter.py moscow-districts.geojson mkad.geojson
-```
-
-По умолчанию результат будет записан в:
-
-```text
-districts-in-mkad.geojson
-```
-
-То же самое с явным выходным файлом:
-
-```sh
-python3 mkad_district_filter.py moscow-districts.geojson mkad.geojson districts-in-mkad.geojson
-```
-
-Если у файла есть право на выполнение, можно запускать так:
-
-```sh
-./mkad_district_filter.py moscow-districts.geojson mkad.geojson
-```
-
-## Содержимое
-
-В репозитории есть:
-
-- исходные районы Москвы в GeoJSON
-- геометрия МКАД в GeoJSON
-- облегченная геометрия МКАД
-- готовый файл с районами внутри МКАД
-- Python скрипт для повторной генерации результата
-
-## Обработка геоданных
-
-`mkad_district_filter.py` берёт два входных GeoJSON файла:
-
-```text
-moscow-districts.geojson
-mkad.geojson
-```
-
-И создаёт выходной файл:
-
-```text
-districts-in-mkad.geojson
-```
-
-По умолчанию скрипт:
-
-1. читает геометрию районов Москвы
-1. читает геометрию МКАД
-1. переводит геометрию из EPSG:4326 в EPSG:3857 для расчетов в метрах
-1. проверяет, какие районы попадают внутрь МКАД
-1. оставляет районы, у которых достаточно площади внутри МКАД
-1. обрезает геометрию районов по границе МКАД
-1. упрощает результат
-1. записывает итоговый GeoJSON
-
-Район остается в результате, если выполняется одно из условий:
-
-- не меньше заданной доли площади района находится внутри МКАД
-- representative point района находится внутри МКАД
-
-Порог площади по умолчанию:
-
-```text
-0.1
-```
-
-То есть район остается, если не меньше 10% его площади попадает внутрь МКАД.
-
-## Режим без обрезки
-
-Обычный режим режет геометрию районов по МКАД.
-
-Если нужно только отобрать районы, но оставить их исходную геометрию целиком:
-
-```sh
-python3 mkad_district_filter.py moscow-districts.geojson mkad.geojson --no-clip
-```
-
-Этот режим может оставить части районов за пределами МКАД, если исходная геометрия района содержит такие полигоны.
-
-## Основные параметры
-
-| Параметр | Значение |
-|---|---|
-| `--no-clip` | Не обрезать геометрию по МКАД, оставить исходные полигоны районов. |
-| `--keep-properties` | Сохранить свойства исходных районов в выходном GeoJSON. |
-| `--min-ratio N` | Минимальная доля площади района внутри МКАД. По умолчанию: `0.1`. |
-| `--simplify-m N` | Упростить геометрию в метрах в EPSG:3857. По умолчанию: `60`. |
-| `--buffer-m N` | Добавить буфер к геометрии МКАД перед фильтрацией. По умолчанию: `0`. |
-
-## Примеры
-
-Обрезать районы по МКАД:
-
-```sh
-python3 mkad_district_filter.py moscow-districts.geojson mkad.geojson
-```
-
-Обрезать районы по МКАД и явно указать выходной файл:
-
-```sh
-python3 mkad_district_filter.py moscow-districts.geojson mkad.geojson districts-in-mkad.geojson
-```
-
-Оставить исходную геометрию районов без обрезки:
-
-```sh
-python3 mkad_district_filter.py moscow-districts.geojson mkad.geojson --no-clip
-```
-
-Сохранить свойства районов:
-
-```sh
-python3 mkad_district_filter.py moscow-districts.geojson mkad.geojson districts-in-mkad.geojson --keep-properties
-```
-
-Изменить порог площади:
-
-```sh
-python3 mkad_district_filter.py moscow-districts.geojson mkad.geojson districts-in-mkad.geojson --min-ratio 0.2
-```
-
-Отключить упрощение геометрии:
-
-```sh
-python3 mkad_district_filter.py moscow-districts.geojson mkad.geojson districts-in-mkad.geojson --simplify-m 0
-```
-
-Добавить буфер к МКАД перед фильтрацией:
-
-```sh
-python3 mkad_district_filter.py moscow-districts.geojson mkad.geojson districts-in-mkad.geojson --buffer-m 100
-```
-
-## Проверка GeoJSON
-
-Проверить, сколько объектов в готовом файле:
-
-```sh
-jq '.features | length' districts-in-mkad.geojson
-```
-
-Посмотреть тип GeoJSON:
-
-```sh
-jq -r '.type' districts-in-mkad.geojson
-```
-
-Проверить, что файл является FeatureCollection:
-
-```sh
-jq -e '.type == "FeatureCollection"' districts-in-mkad.geojson
-```
-
-## Система координат
-
-Входные GeoJSON файлы хранятся в EPSG:4326.
-
-Для расчетов площади, буфера и упрощения скрипт временно переводит геометрию в EPSG:3857. После обработки результат снова записывается в EPSG:4326.
-
-Это нужно, чтобы параметры вроде `--simplify-m` и `--buffer-m` задавались в метрах.
+В каталоге `geojson/` находятся полный и облегченный контуры МКАД,
+исходные районы Москвы и готовая выборка районов внутри МКАД.
+В каталоге `svg/` лежат соответствующие векторные изображения.
+В каталоге `scripts/` находятся утилиты для самостоятельной обработки данных.
 
 ## Структура проекта
 
@@ -265,26 +26,107 @@ jq -e '.type == "FeatureCollection"' districts-in-mkad.geojson
 .
 |-- LICENSE
 |-- README.md
-|-- districts-in-mkad.geojson
-|-- example1.png
-|-- example2.png
-|-- low-resolution-mkad.geojson
-|-- mkad.geojson
-|-- mkad_district_filter.py
-`-- moscow-districts.geojson
+|-- geojson/
+|   |-- districts-in-mkad.geojson
+|   |-- low-resolution-mkad.geojson
+|   |-- mkad.geojson
+|   `-- moscow-districts.geojson
+|-- scripts/
+|   |-- geojson_to_svg.py
+|   `-- mkad_district_filter.py
+`-- svg/
+    |-- districts-in-mkad.svg
+    |-- low-resolution-mkad.svg
+    |-- mkad.svg
+    `-- moscow-districts.svg
 ```
 
-| Файл | Назначение |
-|---|---|
-| `moscow-districts.geojson` | Исходные районы Москвы в GeoJSON. |
-| `mkad.geojson` | Геометрия МКАД в GeoJSON. |
-| `low-resolution-mkad.geojson` | Облегченная геометрия МКАД для быстрых карт и превью. |
-| `districts-in-mkad.geojson` | Районы Москвы, отобранные и обрезанные по границе МКАД. |
-| `mkad_district_filter.py` | Скрипт для отбора и обрезки районов по МКАД. |
-| `example1.png` | Пример отображения границы МКАД. |
-| `example2.png` | Пример отображения районов внутри МКАД. |
-| `LICENSE` | Лицензия проекта. |
+Исходными данными служат `moscow-districts.geojson` и `mkad.geojson`.
+`low-resolution-mkad.geojson` - сохраненный облегченный контур МКАД.
+`districts-in-mkad.geojson` - ранее рассчитанная выборка из 107 районов
+с обрезкой по МКАД. Эти файлы сохранены из первоначального архива без изменений.
+
+`moscow-districts.geojson` содержит 119 полигональных объектов районов
+и 119 точечных объектов. В SVG отображаются только полигоны.
+
+## Требования
+
+Для работы Python-скриптов нужны Python 3, Shapely и PyProj.
+На Arch Linux:
+
+```sh
+sudo pacman -S python python-shapely python-pyproj
+```
+
+Готовые файлы GeoJSON и SVG можно использовать без этих зависимостей.
+
+## Генерация SVG
+
+Запускать из корня репозитория:
+
+```sh
+python3 scripts/geojson_to_svg.py \
+    geojson/mkad.geojson svg/mkad.svg \
+    --bounds geojson/mkad.geojson --stroke-width 2 --fill-opacity 0.15
+
+python3 scripts/geojson_to_svg.py \
+    geojson/districts-in-mkad.geojson svg/districts-in-mkad.svg \
+    --bounds geojson/mkad.geojson --stroke-width 0.9 --fill-opacity 0.16
+
+python3 scripts/geojson_to_svg.py \
+    geojson/moscow-districts.geojson svg/moscow-districts.svg
+
+python3 scripts/geojson_to_svg.py \
+    geojson/low-resolution-mkad.geojson svg/low-resolution-mkad.svg \
+    --bounds geojson/mkad.geojson
+```
+
+У всех трех SVG, связанных с МКАД, общая область отображения
+благодаря `--bounds geojson/mkad.geojson`.
+Полная карта районов Москвы использует собственную область отображения.
+
+Размер изображения задается `--width`, отступы - `--padding`,
+толщина контура - `--stroke-width`, прозрачность заливки - `--fill-opacity`.
+Дополнительное упрощение только SVG включается аргументом
+`--simplify-m N` с допуском в метрах. По умолчанию `--simplify-m 0`,
+то есть геометрия не упрощается дополнительно.
+
+Генератор SVG читает GeoJSON и не перезаписывает его.
+
+## Пересоздание выборки районов внутри МКАД
+
+Исходный `mkad_district_filter.py` перенесен в `scripts/` без изменения кода
+и набора аргументов. Чтобы намеренно пересоздать производный GeoJSON:
+
+```sh
+python3 scripts/mkad_district_filter.py \
+    geojson/moscow-districts.geojson \
+    geojson/mkad.geojson \
+    geojson/districts-in-mkad.geojson \
+    --simplify-m 60
+```
+
+Параметр `--simplify-m N` задает упрощение в метрах, `0` отключает его.
+Также доступны `--no-clip`, `--keep-properties`, `--min-ratio N`
+и `--buffer-m N`. Все значения можно проверить через `--help`.
+
+Эта команда перезаписывает `geojson/districts-in-mkad.geojson`.
+Она не нужна для обычной генерации SVG. Поскольку обработка использует
+операции с плавающей точкой, повторный экспорт может отличаться побайтово
+от сохраненного набора даже при визуально одинаковой геометрии.
+
+Отдельного исходного генератора `low-resolution-mkad.geojson` не было.
+Готовый файл сохраняется без изменений.
+
+## Проверка
+
+```sh
+python3 scripts/mkad_district_filter.py --help
+python3 scripts/geojson_to_svg.py --help
+jq -e '.type == "FeatureCollection"' geojson/districts-in-mkad.geojson
+```
 
 ## Лицензия
 
-Проект распространяется под лицензией GNU Affero General Public License v3.0. Подробности см. в файле [LICENSE](LICENSE).
+Проект распространяется под лицензией GNU Affero General Public License v3.0.
+Подробности см. в файле [LICENSE](LICENSE).
